@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>لوحة تحكم Dodzy — Admin</title>
+  <style>
+    :root{--bg:#f7f7f7;--card:#fff;--accent:#b39261;--muted:#666}
+    body{font-family:system-ui,Segoe UI,Roboto,"Noto Sans Arabic",sans-serif;background:var(--bg);margin:0;padding:20px;color:#222}
+    h1{margin:0 0 16px;font-size:20px}
+    .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:18px}
+    .card{background:var(--card);padding:14px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+    label{display:block;margin-bottom:8px;font-size:13px;color:var(--muted)}
+    input[type="text"],input[type="number"],textarea,select{width:100%;padding:8px;border:1px solid #e6e6e6;border-radius:6px;margin-top:6px;font-size:14px}
+    .row{display:flex;gap:8px}
+    button{background:var(--accent);color:#fff;border:0;padding:8px 10px;border-radius:6px;cursor:pointer}
+    .muted-btn{background:#ddd;color:#333}
+    .small{font-size:13px;color:var(--muted)}
+    ul.products{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+    li.product{display:flex;gap:10px;align-items:center;border:1px solid #f0e9df;padding:10px;border-radius:8px}
+    .thumb{width:68px;height:68px;flex:0 0 68px;border-radius:6px;background:#f2f2f2;background-size:cover;background-position:center}
+    .prod-info{flex:1}
+    .prod-actions{display:flex;gap:6px}
+    pre{white-space:pre-wrap;background:#111;color:#fff;padding:10px;border-radius:6px;overflow:auto;max-height:240px}
+    .full-width{grid-column:1/-1}
+    .danger{background:#c0392b}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+  <h1>لوحة تحكم Dodzy — تعديل الإعدادات والمنتجات</h1>
+  <div class="wrap">
+    <section class="card">
+      <h2 style="font-size:16px">إعدادات المتجر</h2>
+      <label>رقم الواتساب<input id="wa" type="text" placeholder="01068177379"></label>
+      <label>رابط إنستجرام<input id="instagram" type="text" placeholder="https://instagram.com/..."></label>
+      <label>رابط تيك توك<input id="tiktok" type="text" placeholder="https://tiktok.com/..."></label>
+      <label>رابط فيسبوك<input id="facebook" type="text" placeholder="https://facebook.com/..."></label>
+      <div style="margin-top:8px" class="row">
+        <button id="saveSettings">حفظ الإعدادات</button>
+        <button id="resetSettings" class="muted-btn">إعادة للقيم الافتراضية</button>
+        <button id="exportSettings" class="muted-btn">تصدير JSON</button>
+      </div>
+      <hr style="margin:12px 0;border:none;border-top:1px solid #eee">
+      <h2 style="font-size:16px">قائمة المنتجات</h2>
+      <div style="display:grid;grid-template-columns:1fr 120px;gap:8px">
+        <div>
+          <label>اسم المنتج<input id="p_name" type="text"></label>
+          <label>الصنف<select id="p_category">
+            <option value="necklaces">necklaces</option>
+            <option value="bracelets">bracelets</option>
+            <option value="rings">rings</option>
+            <option value="earrings">earrings</option>
+            <option value="other">other</option>
+          </select></label>
+          <label>السعر (EGP)<input id="p_price" type="number" min="0"></label>
+          <label>السعر القديم (اختياري)<input id="p_old" type="number" min="0"></label>
+          <label>الوسم (tag)<input id="p_tag" type="text" placeholder="مثال: New Arrival"></label>
+          <label>وصف<textarea id="p_desc" rows="2"></textarea></label>
+          <label>رابط الصورة<input id="p_image" type="text" placeholder="https://..."></label>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:stretch">
+          <button id="addProduct">أضف منتج جديد</button>
+          <button id="updateProduct" class="muted-btn" disabled>تحديث المنتج المحدد</button>
+          <button id="clearForm" class="muted-btn">تفريغ الحقول</button>
+          <div style="margin-top:auto">
+            <button id="exportProducts" class="muted-btn">تصدير المنتجات</button>
+            <button id="importProducts" class="muted-btn">استيراد من JSON</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <p class="small">قائمة المنتجات الحالية:</p>
+        <ul id="productList" class="products"></ul>
+      </div>
+    </section>
+
+    <aside class="card">
+      <h2 style="font-size:16px">عمليات سريعة</h2>
+      <div class="controls" style="margin-bottom:10px">
+        <button id="pushToSite" title="تحديث بيانات localStorage الخاصة بالموقع">تطبيق للتجربة (write to localStorage)</button>
+        <button id="clearProducts" class="muted-btn">حذف جميع المنتجات</button>
+        <button id="clearOrders" class="muted-btn">مسح الطلبات (dodzyOrders)</button>
+        <button id="openSite" class="muted-btn">فتح صفحة المتجر</button>
+      </div>
+      <hr style="margin:12px 0;border:none;border-top:1px solid #eee">
+      <h3 style="font-size:14px">استيراد / تصدير</h3>
+      <p class="small">يمكنك نسخ JSON أو تحميله/رفعه لتحديث القائمة أو الإعدادات.</p>
+      <pre id="jsonPreview">{}</pre>
+      <div style="margin-top:10px" class="row">
+        <button id="downloadAll" class="muted-btn">تحميل نسخة backup</button>
+        <button id="loadSample" class="muted-btn">تحميل بيانات افتراضيّة</button>
+      </div>
+      <hr style="margin:12px 0;border:none;border-top:1px solid #eee">
+      <p class="small">ملاحظات:</p>
+      <ul style="padding-left:18px;margin:6px 0;color:var(--muted)">
+        <li>البيانات تحفظ في localStorage بالمفاتيح: <b>dodzySettings</b> و <b>dodzyProducts</b></li>
+        <li>بعد الضغط على "تطبيق للتجربة" افتح صفحة المتجر في تبويب جديد ليتم قراءة التغييرات</li>
+      </ul>
+    </aside>
+
+    <section class="card full-width">
+      <h2 style="font-size:16px">سجل التشغيل</h2>
+      <div id="log" style="min-height:72px;font-size:13px;color:var(--muted)"></div>
+    </section>
+  </div>
+
+  <input id="fileInput" type="file" accept="application/json" style="display:none">
+
+  <script>
+    // مفاتيح localStorage المستخدمة في صفحة المتجر
+    const SETTINGS_KEY = "dodzySettings";
+    const PRODUCTS_KEY = "dodzyProducts";
+    const ORDERS_KEY = "dodzyOrders";
+
+    // عناصر DOM
+    const $ = id => document.getElementById(id);
+    const log = msg => {
+      const el = $("log");
+      el.innerHTML = (new Date()).toLocaleTimeString() + " — " + msg + "<br>" + el.innerHTML;
+    };
+
+    // افتراضيات مطابقة للملف الأصلي
+    const DEFAULT_SETTINGS = {
+      instagram: "https://www.instagram.com/dodzy.accessories?dlrf=NHNtZHR6Z2lsYWx6",
+      tiktok: "https://www.tiktok.com/@dodzy.accessories?_r=1&_t=ZS-9AUqnBMQEIE",
+      facebook: "",
+      whatsapp: "01068177379"
+    };
+
+    const DEFAULT_PRODUCTS = [
+      {id:1,name:"Soft Glow Necklace",category:"necklaces",price:320,oldPrice:380,tag:"Bestseller",desc:"A delicate detail for your everyday look",image:"https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1000&q=85"},
+      {id:2,name:"Golden Duo Bracelets",category:"bracelets",price:275,oldPrice:null,tag:"New Arrival",desc:"Shine with layers of elegance",image:"https://images.unsplash.com/photo-1573408301185-9146fe634ad?auto=format&fit=crop&w=1000&q=85"}
+    ];
+
+    // تحميل من localStorage أو افتراضيات
+    function loadSettings(){
+      try {
+        return {...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}")};
+      } catch(e) { return {...DEFAULT_SETTINGS}; }
+    }
+    function loadProducts(){
+      try {
+        const p = JSON.parse(localStorage.getItem(PRODUCTS_KEY) || "null");
+        return Array.isArray(p) ? p : DEFAULT_PRODUCTS.slice();
+      } catch(e) { return DEFAULT_PRODUCTS.slice(); }
+    }
+
+    // عناصر واجهة
+    const wa = $("wa"), instagram = $("instagram"), tiktok = $("tiktok"), facebook = $("facebook");
+    const p_name = $("p_name"), p_category = $("p_category"), p_price = $("p_price"), p_old = $("p_old"), p_tag = $("p_tag"), p_desc = $("p_desc"), p_image = $("p_image");
+    const productList = $("productList"), jsonPreview = $("jsonPreview");
+
+    let settings = loadSettings();
+    let products = loadProducts();
+    let editingId = null;
+
+    function renderSettingsForm(){
+      wa.value = settings.whatsapp || "";
+      instagram.value = settings.instagram || "";
+      tiktok.value = settings.tiktok || "";
+      facebook.value = settings.facebook || "";
+      log("تم تحميل إعدادات المتجر");
+      updatePreview();
+    }
+
+    function renderProductList(){
+      productList.innerHTML = "";
+      products.forEach(p=>{
+        const li = document.createElement("li");
+        li.className = "product";
+        const thumb = document.createElement("div");
+        thumb.className = "thumb";
+        thumb.style.backgroundImage = `url(${p.image||""})`;
+        const info = document.createElement("div");
+        info.className = "prod-info";
+        info.innerHTML = `<strong>${p.name}</strong><div class="small">${p.category} · ${p.tag || ""}</div><div class="small">السعر: ${p.price} EGP ${p.oldPrice?(' · قبل: '+p.oldPrice+' EGP'):''}</div><div class="small">${p.desc||""}</div>`;
+        const actions = document.createElement("div");
+        actions.className = "prod-actions";
+        const edit = document.createElement("button");
+        edit.textContent = "تعديل"; edit.className = "";
+        edit.addEventListener("click", ()=> startEdit(p.id));
+        const del = document.createElement("button");
+        del.textContent = "حذف"; del.className = "muted-btn";
+        del.addEventListener("click", ()=> {
+          if(confirm("متأكد من حذف المنتج؟")) {
+            products = products.filter(x=>x.id!==p.id);
+            saveProducts(false);
+            renderProductList();
+            log("حُذف منتج: "+p.name);
+          }
+        });
+        actions.appendChild(edit); actions.appendChild(del);
+        li.appendChild(thumb); li.appendChild(info); li.appendChild(actions);
+        productList.appendChild(li);
+      });
+      updatePreview();
+    }
+
+    function startEdit(id){
+      const p = products.find(x=>x.id===id);
+      if(!p) return;
+      editingId = id;
+      p_name.value = p.name; p_category.value = p.category; p_price.value = p.price; p_old.value = p.oldPrice||"";
+      p_tag.value = p.tag||""; p_desc.value = p.desc||""; p_image.value = p.image||"";
+      $("updateProduct").disabled = false;
+      log("جاري تحرير المنتج: "+p.name);
+    }
+
+    function clearForm(){
+      editingId = null;
+      p_name.value=""; p_category.value="necklaces"; p_price.value=""; p_old.value=""; p_tag.value=""; p_desc.value=""; p_image.value="";
+      $("updateProduct").disabled = true;
+    }
+
+    // حفظ وإظهار JSON
+    function saveSettings(showLog=true){
+      const s = {instagram: instagram.value.trim(), tiktok: tiktok.value.trim(), facebook: facebook.value.trim(), whatsapp: wa.value.trim()};
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+      settings = s;
+      if(showLog) log("تم حفظ الإعدادات");
+      updatePreview();
+    }
+
+    function saveProducts(showLog=true){
+      // ensure unique id
+      products = products.map(p => ({...p}));
+      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+      if(showLog) log("تم حفظ قائمة المنتجات ("+products.length+")");
+      updatePreview();
+    }
+
+    // أزرار الحدث
+    $("saveSettings").addEventListener("click", ()=> { saveSettings(); alert("تم حفظ الإعدادات في هذا المتصفح"); });
+    $("resetSettings").addEventListener("click", ()=> {
+      if(!confirm("إعادة الإعدادات للقيم الافتراضية؟")) return;
+      settings = {...DEFAULT_SETTINGS};
+      saveSettings();
+      renderSettingsForm();
+    });
+    $("exportSettings").addEventListener("click", ()=> {
+      const data = JSON.stringify(settings, null, 2);
+      downloadText("dodzy-settings.json", data);
+      log("تم تصدير الإعدادات كملف JSON");
+    });
+
+    $("addProduct").addEventListener("click", ()=> {
+      const name = p_name.value.trim();
+      if(!name || !p_price.value) { alert("ادخل اسم المنتج والسعر"); return; }
+      const id = products.length ? Math.max(...products.map(x=>x.id))+1 : 1;
+      const p = {
+        id,
+        name,
+        category: p_category.value,
+        price: Number(p_price.value),
+        oldPrice: p_old.value?Number(p_old.value):null,
+        tag: p_tag.value.trim(),
+        desc: p_desc.value.trim(),
+        image: p_image.value.trim()
+      };
+      products.unshift(p);
+      saveProducts();
+      renderProductList();
+      clearForm();
+      log("أضيف منتج: "+p.name);
+    });
+
+    $("updateProduct").addEventListener("click", ()=> {
+      if(!editingId) return;
+      const p = products.find(x=>x.id===editingId);
+      if(!p) return;
+      p.name = p_name.value.trim();
+      p.category = p_category.value;
+      p.price = Number(p_price.value);
+      p.oldPrice = p_old.value?Number(p_old.value):null;
+      p.tag = p_tag.value.trim();
+      p.desc = p_desc.value.trim();
+      p.image = p_image.value.trim();
+      saveProducts();
+      renderProductList();
+      clearForm();
+      log("تم تحديث المنتج: "+p.name);
+    });
+
+    $("clearForm").addEventListener("click", clearForm);
+
+    $("exportProducts").addEventListener("click", ()=> {
+      downloadText("dodzy-products.json", JSON.stringify(products, null, 2));
+      log("تم تصدير المنتجات كملف JSON");
+    });
+
+    $("importProducts").addEventListener("click", ()=> {
+      $("fileInput").click();
+    });
+
+    $("fileInput").addEventListener("change", (e)=>{
+      const f = e.target.files[0];
+      if(!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if(!Array.isArray(data)) throw new Error("الملف لا يحتوي على مصفوفة منتجات");
+          products = data.map((p, i)=> ({ id: p.id||Date.now()+i, name:p.name||"no-name", category:p.category||"other", price:Number(p.price||0), oldPrice:p.oldPrice||null, tag:p.tag||"", desc:p.desc||"", image:p.image||"" }));
+          saveProducts();
+          renderProductList();
+          log("تم استيراد المنتجات من ملف JSON");
+        } catch(err) {
+          alert("خطأ في استيراد الملف: "+err.message);
+        }
+      };
+      reader.readAsText(f);
+      e.target.value = "";
+    });
+
+    // عمليات سريعة
+    $("pushToSite").addEventListener("click", ()=> {
+      saveSettings(false);
+      saveProducts(false);
+      alert("تم كتابة البيانات في localStorage. افتح صفحة المتجر في تبويب آخر لتحديث العرض.");
+      log("كتبنا dodzySettings و dodzyProducts في localStorage لتجربة مباشرة");
+    });
+
+    $("clearProducts").addEventListener("click", ()=> {
+      if(!confirm("هل تريد حذف جميع المنتجات؟")) return;
+      products = [];
+      saveProducts();
+      renderProductList();
+      log("تم حذف كل المنتجات");
+    });
+
+    $("clearOrders").addEventListener("click", ()=> {
+      if(!confirm("حذف سجل الطلبات المخزن في المتصفح (dodzyOrders)؟")) return;
+      localStorage.removeItem(ORDERS_KEY);
+      log("حذفنا dodzyOrders");
+    });
+
+    $("openSite").addEventListener("click", ()=> {
+      // نحاول فتح اسم الريبو كـ index.html في نفس المكان — اذا لم يكن index موجود سيفتح ملف المشروع
+      const repoHostname = location.hostname.includes("github") ? ("https://"+location.hostname) : "";
+      // نفتح صفحتك على GitHub Pages إن وجدت حسب الشكل المتوقع
+      const ghPages = `https://${location.pathname.split("/")[1] || "engmoazmahmoudelsharqawy"}.github.io/${location.pathname.split("/")[1] ? "" : ""}`;
+      // الأفضل أن يفتح المستخدم بنفس الريبو أو تفتح ملف index محلي
+      window.open(window.location.origin + window.location.pathname.replace(/admin\.html.*$/,"") + "index.html", "_blank");
+    });
+
+    $("downloadAll").addEventListener("click", ()=> {
+      const blob = {settings, products, exportedAt: new Date().toISOString()};
+      downloadText("dodzy-backup.json", JSON.stringify(blob, null, 2));
+      log("تم تحميل نسخة احتياطية");
+    });
+
+    $("loadSample").addEventListener("click", ()=> {
+      if(!confirm("استبدال المنتجات بالإفتراضيّة؟")) return;
+      products = DEFAULT_PRODUCTS.slice();
+      settings = {...DEFAULT_SETTINGS};
+      saveProducts(); saveSettings();
+      renderProductList(); renderSettingsForm();
+      log("تحميل بيانات افتراضية");
+    });
+
+    // زر مساعدة لتحميل JSON كنص
+    function downloadText(filename, text){
+      const a = document.createElement("a");
+      const blob = new Blob([text], {type:"application/json"});
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function updatePreview(){
+      const out = {settings, productsCount: products.length, sampleProduct: products[0] || null};
+      jsonPreview.textContent = JSON.stringify(out, null, 2);
+    }
+
+    // تهيئة الواجهة
+    renderSettingsForm();
+    renderProductList();
+    updatePreview();
+
+    // عرض المحتويات عند التحميل المباشر
+    log("لوحة التحكم جاهزة للعمل");
+  </script>
+</body>
+</html>
