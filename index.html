@@ -1,1 +1,377 @@
-<footer><a href="#home" class="footer-brand">Dodzy <span>Accessories</span></a><p>Accessories That Tell Your Story ♡</p><div class="footer-links"><a href="#shop">Shop</a><a href="#about">About Dodzy</a><a href="#contact">Contact</a><a href="admin.html">Admin</a></div><p class="copyright">© <span id="year"></span> Dodzy Accessories</p></footer>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dodzy Accessories</title>
+  <style>
+    :root {
+      --bg: #f7f7f7;
+      --card: #ffffff;
+      --accent: #b39261;
+      --muted: #666;
+      --text: #222;
+      --line: #eee;
+      --tag-bg: #f8ebdc;
+      --tag-text: #7a4c1d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, Segoe UI, Roboto, "Noto Sans Arabic", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    a { color: inherit; }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+    header {
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 0;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+    }
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f8f0e7, #efe0d0);
+      color: #6a4927;
+      font-size: 22px;
+    }
+    .brand small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .nav a,
+    .primary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+    .muted-btn {
+      background: #ececec;
+      color: #222;
+    }
+    main {
+      padding: 22px 0 40px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #fffaf4, #f7f1e8);
+      border: 1px solid #f0e9df;
+      border-radius: 16px;
+      padding: 28px 20px;
+      margin: 18px 0 28px;
+    }
+    .hero h2 {
+      margin: 0 0 10px;
+      font-size: clamp(22px, 4vw, 36px);
+    }
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .product {
+      background: var(--card);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      border: 1px solid #f2f2f2;
+    }
+    .product-image {
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      background-color: #f2f2f2;
+      border-bottom: 1px solid #f3f3f3;
+    }
+    .product-body {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .product-title {
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .tag {
+      display: inline-block;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      width: fit-content;
+    }
+    .product-desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      min-height: 38px;
+    }
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .old-price {
+      color: var(--muted);
+      text-decoration: line-through;
+      font-size: 13px;
+    }
+    .price {
+      font-size: 20px;
+      font-weight: 800;
+      color: #2a2a2a;
+    }
+    .empty {
+      display: none;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed #ddd;
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 18px;
+    }
+    footer {
+      background: #fff;
+      border-top: 1px solid var(--line);
+      padding: 18px 0;
+      margin-top: 18px;
+    }
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 640px) {
+      .topbar { align-items: flex-start; }
+      .nav { width: 100%; }
+      .nav a { flex: 1; }
+      .hero { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container topbar">
+      <div class="brand">
+        <div class="brand-mark">D</div>
+        <div>
+          Dodzy Accessories
+          <small>Accessories That Tell Your Story ♡</small>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#shop">المتجر</a>
+        <a class="muted-btn" href="admin.html">لوحة التحكم</a>
+        <button class="primary-btn" id="waBtn" type="button">واتساب</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="hero" id="shop">
+        <h2>تشكيلة أنيقة للموضة اليومية</h2>
+        <p>اكتشف إكسسوارات تجمع بين الأناقة، التفاصيل الهادئة، واللمسة الشخصية.</p>
+      </section>
+
+      <div id="productList" class="products-grid"></div>
+      <div id="emptyState" class="empty">لا توجد منتجات متاحة الآن. افتح لوحة التحكم لإضافة المنتجات.</div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-row">
+      <div>
+        <strong>Dodzy Accessories</strong>
+      </div>
+      <div id="footerLinks" style="color: var(--muted);"></div>
+    </div>
+  </footer>
+
+  <script>
+    const SETTINGS_KEY = 'dodzySettings';
+    const PRODUCTS_KEY = 'dodzyProducts';
+
+    const DEFAULT_SETTINGS = {
+      instagram: 'https://www.instagram.com/',
+      tiktok: 'https://www.tiktok.com/',
+      facebook: 'https://www.facebook.com/',
+      whatsapp: '01068177379'
+    };
+
+    const DEFAULT_PRODUCTS = [
+      {
+        id: 1,
+        name: 'Soft Glow Necklace',
+        category: 'necklaces',
+        price: 320,
+        oldPrice: 380,
+        tag: 'Bestseller',
+        desc: 'A delicate detail for your everyday look',
+        image: 'https://images.unsplash.com/photo-161165202241-...' 
+      },
+      {
+        id: 2,
+        name: 'Golden Duo Bracelets',
+        category: 'bracelets',
+        price: 275,
+        oldPrice: null,
+        tag: 'New Arrival',
+        desc: 'Shine with layers of elegance',
+        image: 'https://images.unsplash.com/photo-1573408301185-9146f...' 
+      }
+    ];
+
+    function readJSON(key, fallback){
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === 'object' ? parsed : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function loadSettings(){
+      return { ...DEFAULT_SETTINGS, ...readJSON(SETTINGS_KEY, {}) };
+    }
+
+    function loadProducts(){
+      const data = readJSON(PRODUCTS_KEY, DEFAULT_PRODUCTS);
+      return Array.isArray(data) && data.length ? data : DEFAULT_PRODUCTS;
+    }
+
+    const settings = loadSettings();
+    const products = loadProducts();
+
+    const productList = document.getElementById('productList');
+    const emptyState = document.getElementById('emptyState');
+    const footerLinks = document.getElementById('footerLinks');
+
+    function renderProducts() {
+      productList.innerHTML = '';
+      if (!products.length) {
+        emptyState.style.display = 'block';
+        return;
+      }
+      emptyState.style.display = 'none';
+
+      products.forEach((p) => {
+        const item = document.createElement('article');
+        item.className = 'product';
+
+        const img = document.createElement('div');
+        img.className = 'product-image';
+        img.style.backgroundImage = p.image ? `url(${p.image})` : 'none';
+
+        const body = document.createElement('div');
+        body.className = 'product-body';
+
+        const title = document.createElement('div');
+        title.className = 'product-title';
+        title.textContent = p.name || 'Product';
+
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.textContent = p.tag || p.category || 'Featured';
+
+        const desc = document.createElement('div');
+        desc.className = 'product-desc';
+        desc.textContent = p.desc || '';
+
+        const priceRow = document.createElement('div');
+        priceRow.className = 'price-row';
+
+        if (p.oldPrice) {
+          const old = document.createElement('span');
+          old.className = 'old-price';
+          old.textContent = `${Number(p.oldPrice).toLocaleString()} EGP`;
+          priceRow.appendChild(old);
+        }
+
+        const price = document.createElement('span');
+        price.className = 'price';
+        price.textContent = `${Number(p.price || 0).toLocaleString()} EGP`;
+        priceRow.appendChild(price);
+
+        body.appendChild(title);
+        body.appendChild(tag);
+        body.appendChild(desc);
+        body.appendChild(priceRow);
+
+        item.appendChild(img);
+        item.appendChild(body);
+        productList.appendChild(item);
+      });
+    }
+
+    function buildFooterLinks(){
+      const links = [];
+      if (settings.instagram) links.push(`<a href="${settings.instagram}" target="_blank" rel="noopener">Instagram</a>`);
+      if (settings.facebook) links.push(`<a href="${settings.facebook}" target="_blank" rel="noopener">Facebook</a>`);
+      if (settings.tiktok) links.push(`<a href="${settings.tiktok}" target="_blank" rel="noopener">TikTok</a>`);
+      footerLinks.innerHTML = links.join(' · ') || 'Connect with us';
+    }
+
+    document.getElementById('waBtn').addEventListener('click', () => {
+      const phone = (settings.whatsapp || DEFAULT_SETTINGS.whatsapp).replace(/[^0-9]/g, '');
+      window.open(`https://wa.me/${phone}`, '_blank', 'noopener');
+    });
+
+    renderProducts();
+    buildFooterLinks();
+  </script>
+</body>
+</html>
